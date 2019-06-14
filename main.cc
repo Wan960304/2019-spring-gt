@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <unistd.h>
 #include <string>
 #include <vector>
@@ -40,7 +41,7 @@ NetworkManager *nm = new NetworkManager();
 
 int main(int argc, char** argv){
 
-    nm->interpret("graph11.txt");
+    nm->interpret("graph.txt");
 
     vertex_name(nm->elist);
 
@@ -151,6 +152,16 @@ int main(int argc, char** argv){
     }
     cout<<endl;
     
+    ofstream fout;
+    fout.open("result.txt");
+    fout<<vertexname[0];
+    for(int i=0;i<out_path.size();i++)
+    {     
+            fout<<"->"<<out_path[i];
+    }
+    fout<<endl;
+    fout.close();
+    
     Gplot *gp = new Gplot();
     gp->gp_add(out_elist);
     gp->gp_dump(true);
@@ -162,42 +173,46 @@ int main(int argc, char** argv){
 
 int ok;  
 int mini=10000; 
-void dfs_path(int s,int l,int *visit)
-{
-  ok=0;                                                                             
-  visit[s]=visit[s]-1;                                                                       
-	for(int i=0;i<vertexname.size();i++)                                              
-	{                                                                                 
-		if(pathnum[s][i]!=0&&visit[i]!=0)                                               
-    {                                                                               
-        pathnum[s][i]=pathnum[s][i]-1;                                              
-        pathnum[i][s]=pathnum[i][s]-1;
-        out_path.push_back(vertexname[i]);
-        /*for(int k=0;k<out_path.size();k++)
-        cout<<out_path[k]<<" ";
-        cout<<endl;*/
-        l=l-1;                                                                      
-        if(l>0)                                                                     
-        {                                                                           
-          dfs_path(i,l,visit);                                                      
-        }                                                                           
-        else if(i==0)                                                               
-        {                                                                           
-            ok=1;                                                                   
-            return;                                                                 
-        }                                                                           
-                                                                                    
-        if(ok==1)  return;                                                          
-                                                                                    
-        l=l+1;                                                                      
-        visit[i]=visit[i]+1;
-        out_path.pop_back();        
-        pathnum[s][i]=pathnum[s][i]+1;                                              
-        pathnum[i][s]=pathnum[i][s]+1;                                              
-    }                                                                               
-	}
-}
-///////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////DFS走完所有補邊後的路徑///////////////////////////////////////
+void dfs_path(int s,int l,int *visit)                                      //
+{                                                                          //
+  ok=0;                                                                    //         
+  visit[s]=visit[s]-1;                                                     //                  
+	for(int i=0;i<vertexname.size();i++)                                     //         
+	{                                                                        //         
+		if(pathnum[s][i]!=0&&visit[i]!=0)                                      //         
+    {                                                                      //         
+        pathnum[s][i]=pathnum[s][i]-1;                                     //         
+        pathnum[i][s]=pathnum[i][s]-1;                                     //
+        out_path.push_back(vertexname[i]);                                 //
+        /*for(int k=0;k<out_path.size();k++)                               //
+        cout<<out_path[k]<<" ";                                            //
+        cout<<endl;*/                                                      //
+        l=l-1;                                                             //         
+        if(l>0)                                                            //         
+        {                                                                  //         
+          dfs_path(i,l,visit);                                             //         
+        }                                                                  //         
+        else if(i==0)                                                      //         
+        {                                                                  //         
+            ok=1;                                                          //         
+            return;                                                        //         
+        }                                                                  //         
+                                                                           //         
+        if(ok==1)  return;                                                 //         
+                                                                           //         
+        l=l+1;                                                             //         
+        visit[i]=visit[i]+1;                                               //
+        out_path.pop_back();                                               //
+        pathnum[s][i]=pathnum[s][i]+1;                                     //         
+        pathnum[i][s]=pathnum[i][s]+1;                                     //         
+    }                                                                      //         
+	}                                                                        //
+}                                                                          //
+/////////////////////////////////////////////////////////////////////////////
+
+////////////對奇數點進行補邊///////////////////////////////////////////////////////////////////
 void odd_path()                                                                              //
 {                                                                                            //
     vector<string> oddname;                                                                  //
@@ -233,7 +248,7 @@ void odd_path()                                                                 
         }                                                                                    //
     }
     
-    cout<<"length of Shortest path between vertex: "<<endl;                                     //
+    cout<<"length of Shortest path between vertex: "<<endl;                                  //
     cout<<"  ";
     for(int i=0;i<m;i++)                                                                     //
       cout<<oddname[i]<<" ";                                                                 //
@@ -247,7 +262,7 @@ void odd_path()                                                                 
         }                                                                                    //
         cout<<endl;                                                                          //
     }
-    cout<<endl;                                                                                    //
+    cout<<endl;                                                                              //
     
     int * sh_visit;                                                                          //
     int * visit;                                                                             //
@@ -286,25 +301,24 @@ void odd_path()                                                                 
             }                                                                                //
         }                                                                                    //
         
-        cout<<"("<<vertexname[se_index[1]]<<","<<vertexname[se_index[3]]<<") ";                    //
+        cout<<"("<<vertexname[se_index[1]]<<","<<vertexname[se_index[3]]<<") ";              //
         
         sh_dfs(se_index[1],allvisit,oddmap[se_index[0]][se_index[2]],se_index[3]);           //
         for(int j=0;j<vertexname.size();j++)                                                 //
           allvisit[j]=0;                                                                     //
-        /*for(int j=0;j<vertexname.size();j++)                                                 //
+        /*for(int j=0;j<vertexname.size();j++)                                               //
         {                                                                                    //
             for(int w=0;w<vertexname.size();w++)                                             //
             cout<<pathnum[j][w]<<" ";                                                        //
             cout<<endl;                                                                      //
-        }*/                                                                                    //
+        }*/                                                                                  //
         se_index.clear();                                                                    //
     }  
-    cout<<"\n"<<endl;                                                                                      //
+    cout<<"\n"<<endl;                                                                        //
 }                                                                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-//////////////////////////////////////////////////////////////////////////////////////
+//////對奇數點配對後的結果，找出最短路徑，加至adjacency matrix :pathnum[][]中/////////
 void sh_dfs(int s,int *visit,int l,int e)                                           //
 {                                                                                   //
 	ok=0;                                                                             //
@@ -338,7 +352,7 @@ void sh_dfs(int s,int *visit,int l,int e)                                       
 //////////////////////////////////////////////////////////////////////////////////////
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////從所有奇數點間的最短路徑進行排列組合，找出最小總和//////////////////////////////
 void sh_num(int **oddmap,int s,int *visit,int m,int temp,int n,int *sh_visit)              //
 {                                                                                          //
     visit[s]=n;                                                                            //
@@ -378,7 +392,7 @@ void sh_num(int **oddmap,int s,int *visit,int m,int temp,int n,int *sh_visit)   
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 
-///////////////////////////////////////////////////////////////////////////////////////
+/////////////////回傳兩點間最短路徑長度 ///////////////////////////////////////////////
 int shortest_pathnum(string start,string end)                                        //
 {                                                                                    //
     Sh_path *sh_list;                                                                //
@@ -428,8 +442,8 @@ int shortest_pathnum(string start,string end)                                   
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////////////////////////////////////
-void edge_pathnum(Edge *etraversal) //pathnum                                             //
+///////////////建立adjacency matrix :pathnum[][]////////////////////////////////////////////
+void edge_pathnum(Edge *etraversal) //                                                    //
 {                                                                                         //
     while(etraversal!=NULL)                                                               //
     {                                                                                     //
@@ -456,13 +470,13 @@ void edge_pathnum(Edge *etraversal) //pathnum                                   
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////
-void vertex_name(Edge *etraversal)//vertex name列在vector vertexname中                    //
+//////////////vertex name列在vector vertexname中////////////////////////////////////////////
+void vertex_name(Edge *etraversal)//                                                      //
 {                                                                                         //
     while(etraversal!=NULL)                                                               //
     {                                                                                     //
         int h=0;                                                                          //
-        int t=0;                                                                          //                                                              
+        int t=0;
         for(int i=0;i<vertexname.size();i++)                                              //              
         {                                                                                 //
             if(etraversal->head->name==vertexname[i])                                     //
