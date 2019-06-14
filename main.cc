@@ -41,7 +41,7 @@ NetworkManager *nm = new NetworkManager();
 
 int main(int argc, char** argv){
 
-    nm->interpret("graph.txt");
+    nm->interpret("graph11.txt");
 
     vertex_name(nm->elist);
 
